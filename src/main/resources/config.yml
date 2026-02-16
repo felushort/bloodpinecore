@@ -108,6 +108,9 @@ spawn-safe-zone:
   enabled: true
   radius: 1500
 
+# Auto-save interval in ticks (6000 ticks = 5 minutes)
+auto-save-interval: 6000
+
 # Messages
 messages:
   prefix: "&c&lBloodpine &7» "

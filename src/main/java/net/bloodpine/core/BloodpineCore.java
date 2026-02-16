@@ -68,6 +68,9 @@ public class BloodpineCore extends JavaPlugin {
         // Start tasks
         startTasks();
         
+        // Start auto-save
+        dataManager.startAutoSave();
+        
         getLogger().info("Bloodpine Ascension Core has been enabled!");
     }
     

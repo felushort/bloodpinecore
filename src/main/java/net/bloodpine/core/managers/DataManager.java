@@ -8,10 +8,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DataManager {
     
@@ -19,10 +21,11 @@ public class DataManager {
     private final Map<UUID, PlayerData> playerDataMap;
     private File dataFile;
     private FileConfiguration dataConfig;
+    private volatile boolean isSaving = false;
     
     public DataManager(BloodpineCore plugin) {
         this.plugin = plugin;
-        this.playerDataMap = new HashMap<>();
+        this.playerDataMap = new ConcurrentHashMap<>();
         setupDataFile();
     }
     
@@ -142,10 +145,48 @@ public class DataManager {
         
         try {
             dataConfig.save(dataFile);
+            plugin.getLogger().info("Saved data for " + playerDataMap.size() + " players");
         } catch (IOException e) {
             plugin.getLogger().severe("Could not save playerdata.yml!");
             e.printStackTrace();
+        } finally {
+            isSaving = false;
         }
+    }
+    
+    /**
+     * Save data asynchronously to prevent lag
+     */
+    public void saveDataAsync() {
+        if (isSaving) {
+            plugin.getLogger().warning("Data save already in progress, skipping...");
+            return;
+        }
+        
+        isSaving = true;
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                saveData();
+            }
+        }.runTaskAsynchronously(plugin);
+    }
+    
+    /**
+     * Auto-save task that runs periodically
+     */
+    public void startAutoSave() {
+        long interval = plugin.getConfig().getLong("auto-save-interval", 6000L); // Default 5 minutes
+        
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                saveDataAsync();
+            }
+        }.runTaskTimerAsynchronously(plugin, interval, interval);
+        
+        plugin.getLogger().info("Auto-save enabled (interval: " + (interval / 20) + " seconds)");
     }
     
     public PlayerData getPlayerData(UUID uuid) {
