@@ -86,6 +86,10 @@ commands:
     description: Claim your daily login reward
     usage: /daily
     aliases: [dailyreward, dr]
+  combatstats:
+    description: View your combat statistics
+    usage: /combatstats
+    aliases: [cs, cstats]
 
 permissions:
   bloodpine.admin:

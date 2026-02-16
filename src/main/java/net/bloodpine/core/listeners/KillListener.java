@@ -44,6 +44,9 @@ public class KillListener implements Listener {
             // Check and award achievements
             plugin.getAchievementManager().checkAchievements(killer);
             
+            // Reset combat stats for the victim
+            plugin.getCombatStatsManager().resetStats(victim.getUniqueId());
+            
             // Update displays
             plugin.getDisplayManager().updateDisplay(killer);
             plugin.getDisplayManager().updateDisplay(victim);

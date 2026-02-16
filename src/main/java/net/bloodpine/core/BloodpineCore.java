@@ -23,6 +23,7 @@ public class BloodpineCore extends JavaPlugin {
     private AchievementManager achievementManager;
     private DailyRewardManager dailyRewardManager;
     private CooldownManager cooldownManager;
+    private CombatStatsManager combatStatsManager;
     private CombatLogListener combatLogListener;
     private StatsGUI statsGUI;
     private LeaderboardGUI leaderboardGUI;
@@ -34,6 +35,13 @@ public class BloodpineCore extends JavaPlugin {
         
         // Save default config
         saveDefaultConfig();
+        
+        // Validate configuration
+        ConfigValidator validator = new ConfigValidator(this);
+        if (!validator.validate()) {
+            getLogger().severe("Configuration validation failed! Plugin may not work correctly.");
+            getLogger().severe("Please fix the configuration errors and reload the plugin.");
+        }
         
         // Initialize managers
         dataManager = new DataManager(this);
@@ -49,6 +57,7 @@ public class BloodpineCore extends JavaPlugin {
         achievementManager = new AchievementManager(this);
         dailyRewardManager = new DailyRewardManager(this);
         cooldownManager = new CooldownManager(this);
+        combatStatsManager = new CombatStatsManager(this);
         combatLogListener = new CombatLogListener(this);
         
         // Initialize GUIs
@@ -104,6 +113,7 @@ public class BloodpineCore extends JavaPlugin {
         getCommand("giveheartitem").setExecutor(new GiveHeartItemCommand(this));
         getCommand("achievements").setExecutor(new AchievementsCommand(this));
         getCommand("daily").setExecutor(new DailyCommand(this));
+        getCommand("combatstats").setExecutor(new CombatStatsCommand(this));
     }
     
     private void registerListeners() {
@@ -206,5 +216,9 @@ public class BloodpineCore extends JavaPlugin {
     
     public CooldownManager getCooldownManager() {
         return cooldownManager;
+    }
+    
+    public CombatStatsManager getCombatStatsManager() {
+        return combatStatsManager;
     }
 }
