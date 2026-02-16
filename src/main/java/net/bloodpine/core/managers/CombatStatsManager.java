@@ -3,9 +3,9 @@ package net.bloodpine.core.managers;
 import net.bloodpine.core.BloodpineCore;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Tracks detailed combat statistics for players
@@ -17,7 +17,7 @@ public class CombatStatsManager {
     
     public CombatStatsManager(BloodpineCore plugin) {
         this.plugin = plugin;
-        this.playerStats = new HashMap<>();
+        this.playerStats = new ConcurrentHashMap<>();
     }
     
     /**

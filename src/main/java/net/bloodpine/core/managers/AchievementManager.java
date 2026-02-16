@@ -9,6 +9,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages player achievements and rewards
@@ -20,7 +21,7 @@ public class AchievementManager {
     
     public AchievementManager(BloodpineCore plugin) {
         this.plugin = plugin;
-        this.playerAchievements = new HashMap<>();
+        this.playerAchievements = new ConcurrentHashMap<>();
     }
     
     /**

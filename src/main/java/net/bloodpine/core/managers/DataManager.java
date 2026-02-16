@@ -184,7 +184,7 @@ public class DataManager {
             public void run() {
                 saveDataAsync();
             }
-        }.runTaskTimerAsynchronously(plugin, interval, interval);
+        }.runTaskTimerAsynchronously(plugin, interval, interval); // Delay first save by interval
         
         plugin.getLogger().info("Auto-save enabled (interval: " + (interval / 20) + " seconds)");
     }

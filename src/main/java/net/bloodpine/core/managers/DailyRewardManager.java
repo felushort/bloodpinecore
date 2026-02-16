@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manages daily login rewards for players
@@ -21,8 +22,8 @@ public class DailyRewardManager {
     
     public DailyRewardManager(BloodpineCore plugin) {
         this.plugin = plugin;
-        this.lastClaim = new HashMap<>();
-        this.streakDays = new HashMap<>();
+        this.lastClaim = new ConcurrentHashMap<>();
+        this.streakDays = new ConcurrentHashMap<>();
     }
     
     /**
