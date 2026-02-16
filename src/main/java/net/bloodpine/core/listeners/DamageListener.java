@@ -73,6 +73,19 @@ public class DamageListener implements Listener {
         
         // Set the modified damage
         event.setDamage(damage);
+        
+        // Track combat statistics
+        try {
+            plugin.getCombatStatsManager().recordDamageDealt(attacker, damage);
+            plugin.getCombatStatsManager().recordDamageTaken(victim, damage);
+            
+            // Check for critical hits
+            if (attacker.getFallDistance() > 0) {
+                plugin.getCombatStatsManager().recordCriticalHit(attacker);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().warning("Error tracking combat stats: " + e.getMessage());
+        }
     }
 
     private boolean isInSpawnSafeZone(Player player) {

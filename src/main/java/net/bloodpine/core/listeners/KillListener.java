@@ -25,23 +25,35 @@ public class KillListener implements Listener {
             return;
         }
         
-        // Handle killstreaks
-        plugin.getKillstreakManager().addKill(killer);
-        plugin.getKillstreakManager().endKillstreak(victim);
-        
-        // Handle bounties
-        plugin.getBountyManager().claimBounty(killer, victim);
-        
-        // Handle token rewards
-        plugin.getTokenManager().handleKillReward(killer, victim);
-        
-        // Handle kill effects (lightning strike on victim's death location)
-        if (plugin.getBoostManager().hasKillEffect(killer)) {
-            victim.getWorld().strikeLightningEffect(victim.getLocation());
+        try {
+            // Handle killstreaks
+            plugin.getKillstreakManager().addKill(killer);
+            plugin.getKillstreakManager().endKillstreak(victim);
+            
+            // Handle bounties
+            plugin.getBountyManager().claimBounty(killer, victim);
+            
+            // Handle token rewards
+            plugin.getTokenManager().handleKillReward(killer, victim);
+            
+            // Handle kill effects (lightning strike on victim's death location)
+            if (plugin.getBoostManager().hasKillEffect(killer)) {
+                victim.getWorld().strikeLightningEffect(victim.getLocation());
+            }
+            
+            // Check and award achievements
+            plugin.getAchievementManager().checkAchievements(killer);
+            
+            // Reset combat stats for the victim
+            plugin.getCombatStatsManager().resetStats(victim.getUniqueId());
+            
+            // Update displays
+            plugin.getDisplayManager().updateDisplay(killer);
+            plugin.getDisplayManager().updateDisplay(victim);
+            
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error handling player kill: " + e.getMessage());
+            e.printStackTrace();
         }
-        
-        // Update displays
-        plugin.getDisplayManager().updateDisplay(killer);
-        plugin.getDisplayManager().updateDisplay(victim);
     }
 }

@@ -108,6 +108,9 @@ spawn-safe-zone:
   enabled: true
   radius: 1500
 
+# Auto-save interval in ticks (6000 ticks = 5 minutes)
+auto-save-interval: 6000
+
 # Messages
 messages:
   prefix: "&c&lBloodpine &7» "
@@ -118,3 +121,17 @@ messages:
   insufficient-tokens: "&cYou don't have enough tokens!"
   max-stat: "&cYou've reached the maximum for {stat}!"
   reset-stats: "&aYour stats have been reset! &e{tokens} tokens &arefunded."
+
+# Daily Rewards
+daily-rewards:
+  enabled: true
+  base-tokens: 3
+  max-streak-bonus: 6
+
+# Command Cooldowns (in seconds)
+cooldowns:
+  bounty: 30
+  paytokens: 10
+  payhearts: 10
+  tshop: 5
+  daily: 5
