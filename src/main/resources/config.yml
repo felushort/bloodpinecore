@@ -1,0 +1,120 @@
+# Bloodpine Ascension Core Configuration
+
+# Token Settings
+tokens:
+  # Tokens earned per kill
+  per-kill: 1
+  # Maximum total tokens a player can have
+  max-total: 50
+  # Tokens lost on death when marked
+  marked-death-penalty: 5
+
+# Stat Caps (percentage based for damage/defense/crystal, actual values for others)
+stats:
+  damage:
+    per-token: 10.0  # 10% per token
+    max-tokens: 10   # 100% max damage increase
+  defense:
+    per-token: 5.0   # 5% per token
+    max-tokens: 10   # 50% max damage reduction
+  crystal:
+    per-token: 0.0   # disabled for non-crystal PvP
+    max-tokens: 0    # disabled for non-crystal PvP
+  totem:
+    per-token: 1     # 1 absorption heart per token on totem pop
+    max-tokens: 8    # 8 absorption hearts max
+  vitality:
+    per-token: 2.0   # 1 heart (2 HP) per token
+    max-tokens: 8    # +8 hearts max
+
+# Marked/Hunted System
+marked:
+  # Tokens required to become marked
+  threshold: 25
+  # Enable glowing effect
+  glow: true
+  # Bounty reward multiplier
+  bounty-multiplier: 2.0
+  # Broadcast when someone becomes marked
+  broadcast: true
+
+# Display Settings
+display:
+  # Show stats above player head
+  show-stats: true
+  # Update interval in ticks (20 ticks = 1 second)
+  update-interval: 20
+  # Format: {damage}/{defense}/{health}
+  format: "&c{damage} &7| &9{defense} &7| &a{vitality}"
+
+# Season Settings
+season:
+  # Season length in days
+  length: 30
+  # Auto-reset on season end
+  auto-reset: true
+
+# Lifesteal Settings
+lifesteal:
+  # Enable lifesteal mechanics
+  enabled: true
+  # Starting hearts for new players
+  starting-hearts: 10
+  # Hearts lost per death
+  hearts-per-death: 1
+  # Hearts gained per kill
+  hearts-per-kill: 1
+  # Maximum hearts a player can have
+  max-hearts: 20
+  # Minimum hearts before elimination
+  min-hearts: 1
+  # Ban eliminated players until next season
+  ban-on-elimination: true
+
+# Rebirth System
+rebirth:
+  # Tokens required to rebirth
+  requirement-tokens: 50
+  # Rebirth points gained per rebirth
+  points-per-rebirth: 1
+  # Permanent bonus per rebirth level
+  damage-bonus-per-level: 0.03
+  defense-bonus-per-level: 0.02
+  vitality-hearts-per-level: 0.5
+
+# Token Shop (in-game /tshop)
+token-shop:
+  heart-shield-cost: 8
+  token-boost-30m-cost: 10
+  kill-effect-30m-cost: 6
+  extra-heart-cost: 15
+  warrior-kit-cost: 20
+  full-heal-cost: 5
+
+# Sidebar (right side scoreboard)
+sidebar:
+  enabled: true
+  title: "&c&lBP"
+  server-ip: "bloodpine.net"
+
+# End Access Control
+end-control:
+  enabled: true
+  open: false
+  owner: "Felushort"
+
+# Spawn Safe Zone (anti spawn-kill)
+spawn-safe-zone:
+  enabled: true
+  radius: 1500
+
+# Messages
+messages:
+  prefix: "&c&lBloodpine &7» "
+  kill-token: "&aYou earned &e1 Token &afrom killing &f{player}&a!"
+  marked: "&c&lYou are now MARKED! &7You have {tokens} tokens and a bounty on your head."
+  marked-broadcast: "&c&l{player} IS NOW MARKED! &7Kill them for &e{bounty} tokens!"
+  stat-allocated: "&aAllocated &e{amount} token(s) &ato &f{stat}&a!"
+  insufficient-tokens: "&cYou don't have enough tokens!"
+  max-stat: "&cYou've reached the maximum for {stat}!"
+  reset-stats: "&aYour stats have been reset! &e{tokens} tokens &arefunded."

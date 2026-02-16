@@ -1,0 +1,88 @@
+name: BloodpineCore
+version: '1.0.0'
+main: net.bloodpine.core.BloodpineCore
+api-version: '1.21'
+author: Bloodpine
+description: Core token and stat system for Bloodpine Ascension
+
+commands:
+  menu:
+    description: Open the stats menu
+    usage: /menu
+    aliases: [gui, statsmenu, m]
+  tokens:
+    description: View your tokens
+    usage: /tokens
+    aliases: [token, t]
+  allocate:
+    description: Allocate tokens to stats
+    usage: /allocate <stat> <amount>
+    aliases: [alloc, a]
+  stats:
+    description: View your stats
+    usage: /stats [player]
+    aliases: [stat, s]
+  resetstats:
+    description: Reset your stat allocation
+    usage: /resetstats
+    aliases: [statswipe]
+  leaderboard:
+    description: View token leaderboard
+    usage: /leaderboard
+    aliases: [lb, top]
+  bounty:
+    description: Place or view bounties
+    usage: /bounty [player] [amount]
+    aliases: [hunt]
+  bloodpine:
+    description: Admin commands
+    usage: /bloodpine <subcommand>
+    permission: bloodpine.admin
+    aliases: [bp, bpadmin]
+  givetoken:
+    description: Give tokens to a player
+    usage: /give <player> <amount>
+    permission: bloodpine.admin
+    aliases: [givetokens]
+  rebirth:
+    description: Rebirth for permanent progression bonuses
+    usage: /rebirth [info]
+    aliases: [rb]
+  tshop:
+    description: Open the in-game token shop
+    usage: /tshop
+    aliases: [tokenshop, shop]
+  paytokens:
+    description: Send your available tokens to another player
+    usage: /paytokens <player> <amount>
+    aliases: [sendtokens, tokenpay]
+  payhearts:
+    description: Send your lifesteal hearts to another player
+    usage: /payhearts <player> <amount>
+    aliases: [sendhearts, heartpay]
+  end:
+    description: Control End access lock
+    usage: /end <open|close|status>
+    permission: bloodpine.endcontrol
+  guide:
+    description: Open the in-game Bloodpine guide book
+    usage: /guide
+    aliases: [helpbook, handbook]
+  givetokenitem:
+    description: Give physical token items to a player
+    usage: /givetokenitem <player> [amount]
+    permission: bloodpine.admin
+    aliases: [givetoken item]
+  giveheartitem:
+    description: Give physical heart items to a player
+    usage: /giveheartitem <player> [amount]
+    permission: bloodpine.admin
+    aliases: [giveheartitem]
+
+permissions:
+  bloodpine.admin:
+    description: Access to admin commands
+    default: op
+  bloodpine.endcontrol:
+    description: Allows controlling End open/close state
+    default: op
