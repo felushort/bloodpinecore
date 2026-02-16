@@ -118,3 +118,17 @@ messages:
   insufficient-tokens: "&cYou don't have enough tokens!"
   max-stat: "&cYou've reached the maximum for {stat}!"
   reset-stats: "&aYour stats have been reset! &e{tokens} tokens &arefunded."
+
+# Daily Rewards
+daily-rewards:
+  enabled: true
+  base-tokens: 3
+  max-streak-bonus: 6
+
+# Command Cooldowns (in seconds)
+cooldowns:
+  bounty: 30
+  paytokens: 10
+  payhearts: 10
+  tshop: 5
+  daily: 5

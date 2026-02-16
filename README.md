@@ -13,6 +13,10 @@ A custom Minecraft Spigot/Paper plugin for the Bloodpine survival server.
 - **Boost System** - Temporary multipliers for XP, damage, etc.
 - **Leaderboards** - Competitive rankings
 - **Marked System** - Mark players for PvP tracking
+- **Achievement System** - Unlock achievements and earn rewards 🎯
+- **Daily Rewards** - Login daily for token bonuses and streaks 🎁
+- **Command Cooldowns** - Anti-spam protection for all commands ⏱️
+- **Enhanced Error Handling** - Robust error management and logging 🛡️
 
 ## Building
 

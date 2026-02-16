@@ -20,6 +20,9 @@ public class BloodpineCore extends JavaPlugin {
     private BoostManager boostManager;
     private RebirthManager rebirthManager;
     private SidebarManager sidebarManager;
+    private AchievementManager achievementManager;
+    private DailyRewardManager dailyRewardManager;
+    private CooldownManager cooldownManager;
     private CombatLogListener combatLogListener;
     private StatsGUI statsGUI;
     private LeaderboardGUI leaderboardGUI;
@@ -43,6 +46,9 @@ public class BloodpineCore extends JavaPlugin {
         boostManager = new BoostManager(this);
         rebirthManager = new RebirthManager(this);
         sidebarManager = new SidebarManager(this);
+        achievementManager = new AchievementManager(this);
+        dailyRewardManager = new DailyRewardManager(this);
+        cooldownManager = new CooldownManager(this);
         combatLogListener = new CombatLogListener(this);
         
         // Initialize GUIs
@@ -93,6 +99,8 @@ public class BloodpineCore extends JavaPlugin {
         getCommand("guide").setExecutor(new GuideCommand());
         getCommand("givetokenitem").setExecutor(new GiveTokenItemCommand(this));
         getCommand("giveheartitem").setExecutor(new GiveHeartItemCommand(this));
+        getCommand("achievements").setExecutor(new AchievementsCommand(this));
+        getCommand("daily").setExecutor(new DailyCommand(this));
     }
     
     private void registerListeners() {
@@ -118,6 +126,11 @@ public class BloodpineCore extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             markedManager.checkMarkedPlayers();
         }, 100L, 100L);
+        
+        // Cleanup cooldowns periodically (every 5 minutes)
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            cooldownManager.cleanup();
+        }, 6000L, 6000L);
     }
     
     public static BloodpineCore getInstance() {
@@ -178,5 +191,17 @@ public class BloodpineCore extends JavaPlugin {
 
     public SidebarManager getSidebarManager() {
         return sidebarManager;
+    }
+    
+    public AchievementManager getAchievementManager() {
+        return achievementManager;
+    }
+    
+    public DailyRewardManager getDailyRewardManager() {
+        return dailyRewardManager;
+    }
+    
+    public CooldownManager getCooldownManager() {
+        return cooldownManager;
     }
 }

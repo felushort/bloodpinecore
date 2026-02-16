@@ -48,36 +48,58 @@ public class DataManager {
         }
         
         for (String uuidString : playersSection.getKeys(false)) {
-            UUID uuid = UUID.fromString(uuidString);
-            ConfigurationSection playerSection = playersSection.getConfigurationSection(uuidString);
-            
-            String name = playerSection.getString("name", "Unknown");
-            PlayerData data = new PlayerData(uuid, name);
-            
-            data.setTotalTokens(playerSection.getInt("totalTokens", 0));
-            data.setTotalKills(playerSection.getInt("totalKills", 0));
-            data.setTotalDeaths(playerSection.getInt("totalDeaths", 0));
-            data.setMarked(playerSection.getBoolean("marked", false));
-            data.setLifestealHearts(playerSection.getInt("lifestealHearts", 0));
-            data.setRebirthLevel(playerSection.getInt("rebirthLevel", 0));
-            data.setRebirthPoints(playerSection.getInt("rebirthPoints", 0));
-            
-            // Load allocated tokens
-            ConfigurationSection statsSection = playerSection.getConfigurationSection("stats");
-            if (statsSection != null) {
-                for (StatType type : StatType.values()) {
-                    int allocated = statsSection.getInt(type.getConfigKey(), 0);
-                    data.setAllocatedTokens(type, allocated);
+            try {
+                UUID uuid = UUID.fromString(uuidString);
+                ConfigurationSection playerSection = playersSection.getConfigurationSection(uuidString);
+                
+                if (playerSection == null) {
+                    plugin.getLogger().warning("Null player section for UUID: " + uuidString);
+                    continue;
                 }
-            }
+                
+                String name = playerSection.getString("name", "Unknown");
+                PlayerData data = new PlayerData(uuid, name);
+                
+                data.setTotalTokens(playerSection.getInt("totalTokens", 0));
+                data.setTotalKills(playerSection.getInt("totalKills", 0));
+                data.setTotalDeaths(playerSection.getInt("totalDeaths", 0));
+                data.setMarked(playerSection.getBoolean("marked", false));
+                data.setLifestealHearts(playerSection.getInt("lifestealHearts", 0));
+                data.setRebirthLevel(playerSection.getInt("rebirthLevel", 0));
+                data.setRebirthPoints(playerSection.getInt("rebirthPoints", 0));
+                
+                // Load allocated tokens
+                ConfigurationSection statsSection = playerSection.getConfigurationSection("stats");
+                if (statsSection != null) {
+                    for (StatType type : StatType.values()) {
+                        int allocated = statsSection.getInt(type.getConfigKey(), 0);
+                        data.setAllocatedTokens(type, allocated);
+                    }
+                }
 
-            int crystalCap = plugin.getConfig().getInt("stats.crystal.max-tokens", 0);
-            int crystalAllocated = data.getAllocatedTokens(StatType.CRYSTAL);
-            if (crystalCap <= 0 && crystalAllocated > 0) {
-                data.setAllocatedTokens(StatType.CRYSTAL, 0);
+                int crystalCap = plugin.getConfig().getInt("stats.crystal.max-tokens", 0);
+                int crystalAllocated = data.getAllocatedTokens(StatType.CRYSTAL);
+                if (crystalCap <= 0 && crystalAllocated > 0) {
+                    data.setAllocatedTokens(StatType.CRYSTAL, 0);
+                }
+                
+                // Load achievements
+                List<String> achievementKeys = playerSection.getStringList("achievements");
+                if (achievementKeys != null && !achievementKeys.isEmpty()) {
+                    plugin.getAchievementManager().loadAchievements(uuid, new java.util.HashSet<>(achievementKeys));
+                }
+                
+                // Load daily reward data
+                String lastClaim = playerSection.getString("daily.lastClaim", "");
+                int streak = playerSection.getInt("daily.streak", 0);
+                plugin.getDailyRewardManager().loadData(uuid, lastClaim, streak);
+                
+                playerDataMap.put(uuid, data);
+                
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error loading data for player " + uuidString + ": " + e.getMessage());
+                e.printStackTrace();
             }
-            
-            playerDataMap.put(uuid, data);
         }
         
         plugin.getLogger().info("Loaded data for " + playerDataMap.size() + " players");
@@ -85,20 +107,36 @@ public class DataManager {
     
     public void saveData() {
         for (PlayerData data : playerDataMap.values()) {
-            String path = "players." + data.getUuid().toString();
-            
-            dataConfig.set(path + ".name", data.getName());
-            dataConfig.set(path + ".totalTokens", data.getTotalTokens());
-            dataConfig.set(path + ".totalKills", data.getTotalKills());
-            dataConfig.set(path + ".totalDeaths", data.getTotalDeaths());
-            dataConfig.set(path + ".marked", data.isMarked());
-            dataConfig.set(path + ".lifestealHearts", data.getLifestealHearts());
-            dataConfig.set(path + ".rebirthLevel", data.getRebirthLevel());
-            dataConfig.set(path + ".rebirthPoints", data.getRebirthPoints());
-            
-            // Save allocated tokens
-            for (StatType type : StatType.values()) {
-                dataConfig.set(path + ".stats." + type.getConfigKey(), data.getAllocatedTokens(type));
+            try {
+                String path = "players." + data.getUuid().toString();
+                
+                dataConfig.set(path + ".name", data.getName());
+                dataConfig.set(path + ".totalTokens", data.getTotalTokens());
+                dataConfig.set(path + ".totalKills", data.getTotalKills());
+                dataConfig.set(path + ".totalDeaths", data.getTotalDeaths());
+                dataConfig.set(path + ".marked", data.isMarked());
+                dataConfig.set(path + ".lifestealHearts", data.getLifestealHearts());
+                dataConfig.set(path + ".rebirthLevel", data.getRebirthLevel());
+                dataConfig.set(path + ".rebirthPoints", data.getRebirthPoints());
+                
+                // Save allocated tokens
+                for (StatType type : StatType.values()) {
+                    dataConfig.set(path + ".stats." + type.getConfigKey(), data.getAllocatedTokens(type));
+                }
+                
+                // Save achievements
+                Set<String> achievementKeys = plugin.getAchievementManager().getAchievementKeys(data.getUuid());
+                dataConfig.set(path + ".achievements", new ArrayList<>(achievementKeys));
+                
+                // Save daily reward data
+                String lastClaim = plugin.getDailyRewardManager().getLastClaimDate(data.getUuid());
+                int streak = plugin.getDailyRewardManager().getStreak(data.getUuid());
+                dataConfig.set(path + ".daily.lastClaim", lastClaim);
+                dataConfig.set(path + ".daily.streak", streak);
+                
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error saving data for player " + data.getUuid() + ": " + e.getMessage());
+                e.printStackTrace();
             }
         }
         

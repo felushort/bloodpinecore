@@ -17,20 +17,32 @@ public class JoinListener implements Listener {
     
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        // Load player data
-        PlayerData data = plugin.getDataManager().getPlayerData(event.getPlayer());
-        
-        // Apply stats (handles starting hearts, lifesteal hearts, and vitality)
-        plugin.getStatManager().applyStats(event.getPlayer());
-        
-        // Update display
-        plugin.getDisplayManager().updateDisplay(event.getPlayer());
-        
-        // Check if should be marked
-        plugin.getMarkedManager().checkMarkedPlayers();
+        try {
+            // Load player data
+            PlayerData data = plugin.getDataManager().getPlayerData(event.getPlayer());
+            
+            // Apply stats (handles starting hearts, lifesteal hearts, and vitality)
+            plugin.getStatManager().applyStats(event.getPlayer());
+            
+            // Update display
+            plugin.getDisplayManager().updateDisplay(event.getPlayer());
+            
+            // Check if should be marked
+            plugin.getMarkedManager().checkMarkedPlayers();
 
-        // Update right-side sidebar
-        plugin.getSidebarManager().updatePlayer(event.getPlayer());
+            // Update right-side sidebar
+            plugin.getSidebarManager().updatePlayer(event.getPlayer());
+            
+            // Notify if daily reward is available
+            if (plugin.getDailyRewardManager().canClaim(event.getPlayer().getUniqueId())) {
+                event.getPlayer().sendMessage(plugin.getConfig().getString("messages.prefix") + 
+                    "§a§lDaily reward available! §7Use §e/daily §7to claim.");
+            }
+            
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error handling player join for " + event.getPlayer().getName() + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @EventHandler

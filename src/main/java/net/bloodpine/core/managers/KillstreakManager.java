@@ -43,12 +43,15 @@ public class KillstreakManager {
         } else if (streak == 5) {
             broadcastKillstreak(killer, "KILLING SPREE", Sound.ENTITY_WITHER_SPAWN);
             giveStreakBonus(killer, 1);
+            plugin.getAchievementManager().unlockAchievement(killer, net.bloodpine.core.data.Achievement.KILLING_SPREE);
         } else if (streak == 10) {
             broadcastKillstreak(killer, "RAMPAGE", Sound.ENTITY_ENDER_DRAGON_DEATH);
             giveStreakBonus(killer, 2);
+            plugin.getAchievementManager().unlockAchievement(killer, net.bloodpine.core.data.Achievement.UNSTOPPABLE);
         } else if (streak == 15) {
             broadcastKillstreak(killer, "UNSTOPPABLE", Sound.ENTITY_WITHER_DEATH);
             giveStreakBonus(killer, 3);
+            plugin.getAchievementManager().unlockAchievement(killer, net.bloodpine.core.data.Achievement.GODLIKE);
         } else if (streak == 20) {
             broadcastKillstreak(killer, "GODLIKE", Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
             giveStreakBonus(killer, 5);

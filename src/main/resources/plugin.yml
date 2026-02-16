@@ -78,6 +78,14 @@ commands:
     usage: /giveheartitem <player> [amount]
     permission: bloodpine.admin
     aliases: [giveheartitem]
+  achievements:
+    description: View your unlocked achievements
+    usage: /achievements
+    aliases: [achieve, ach]
+  daily:
+    description: Claim your daily login reward
+    usage: /daily
+    aliases: [dailyreward, dr]
 
 permissions:
   bloodpine.admin:
@@ -85,4 +93,7 @@ permissions:
     default: op
   bloodpine.endcontrol:
     description: Allows controlling End open/close state
+    default: op
+  bloodpine.bypass.cooldown:
+    description: Bypass command cooldowns
     default: op
