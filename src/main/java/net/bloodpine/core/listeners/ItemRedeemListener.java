@@ -6,6 +6,7 @@ import net.bloodpine.core.utils.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventPriority;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -62,6 +63,34 @@ public class ItemRedeemListener implements Listener {
             redeemStatBoostScroll(player, item);
             return;
         }
+    }
+
+    /**
+     * General phantom-block prevention: runs AFTER all other plugins.
+     * If anything (AuthMe, WorldGuard, etc.) cancels a RIGHT_CLICK_BLOCK
+     * event, we send block-change updates so the client doesn't desync.
+     */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
+    public void onInteractMonitor(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+        if (!event.isCancelled() && event.useItemInHand() != Event.Result.DENY) {
+            return;
+        }
+        Block clicked = event.getClickedBlock();
+        if (clicked == null) {
+            return;
+        }
+        Player player = event.getPlayer();
+        player.sendBlockChange(clicked.getLocation(), clicked.getBlockData());
+        BlockFace face = event.getBlockFace();
+        if (face != null && face != BlockFace.SELF) {
+            Block adjacent = clicked.getRelative(face);
+            player.sendBlockChange(adjacent.getLocation(), adjacent.getBlockData());
+        }
+        // Resync inventory so eating/item-use state is correct on the client
+        player.updateInventory();
     }
 
     /**
