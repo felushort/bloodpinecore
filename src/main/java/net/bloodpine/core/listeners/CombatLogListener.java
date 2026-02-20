@@ -44,10 +44,11 @@ public class CombatLogListener implements Listener {
 
     public void tagPlayer(Player player, Player attacker) {
         UUID uuid = player.getUniqueId();
+        boolean wasInCombat = isInCombat(player);
         combatTag.put(uuid, System.currentTimeMillis());
         lastAttacker.put(uuid, attacker.getUniqueId());
 
-        if (!isInCombat(player)) {
+        if (!wasInCombat) {
             player.sendMessage(colorize("&c&l⚔ You are now in combat! Don't log out!"));
         }
     }

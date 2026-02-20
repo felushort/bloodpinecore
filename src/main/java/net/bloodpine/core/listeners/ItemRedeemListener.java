@@ -4,7 +4,10 @@ import net.bloodpine.core.BloodpineCore;
 import net.bloodpine.core.data.PlayerData;
 import net.bloodpine.core.utils.ItemUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Event;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +28,13 @@ public class ItemRedeemListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
+
+        // Respect auth guard: skip processing for unauthenticated players
+        if (plugin.getAuthManager().isAuthRequired()
+                && !plugin.getAuthManager().isAuthenticated(player)) {
+            return;
+        }
+
         ItemStack item = event.getItem();
         
         // Check for right-click
@@ -35,14 +45,14 @@ public class ItemRedeemListener implements Listener {
         
         // Check if it's a Token item
         if (ItemUtils.isTokenItem(item)) {
-            event.setCancelled(true);
+            cancelAndFixPhantomBlocks(event);
             redeemToken(player, item);
             return;
         }
         
         // Check if it's a Heart item
         if (ItemUtils.isHeartItem(item)) {
-            event.setCancelled(true);
+            cancelAndFixPhantomBlocks(event);
             if (!plugin.getConfig().getBoolean("lifesteal.enabled", true)) {
                 player.sendMessage(colorize("&cBloodpine heart items are currently disabled."));
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
@@ -54,9 +64,31 @@ public class ItemRedeemListener implements Listener {
 
         // Check if it's a Stat Boost Scroll
         if (ItemUtils.isStatBoostScroll(item)) {
-            event.setCancelled(true);
+            cancelAndFixPhantomBlocks(event);
             redeemStatBoostScroll(player, item);
             return;
+        }
+    }
+
+    /**
+     * Cancels the event and sends block-change updates to prevent phantom blocks
+     * that appear on the client when a PlayerInteractEvent is cancelled while
+     * right-clicking on a block (especially with a placeable item in the off-hand).
+     * Setting Result.DENY on the item and block use explicitly signals Paper's
+     * built-in phantom-block correction logic in addition to the manual block refresh.
+     */
+    private void cancelAndFixPhantomBlocks(PlayerInteractEvent event) {
+        event.setUseItemInHand(Event.Result.DENY);
+        event.setUseInteractedBlock(Event.Result.DENY);
+        event.setCancelled(true);
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock() != null) {
+            Block clicked = event.getClickedBlock();
+            BlockFace face = event.getBlockFace();
+            event.getPlayer().sendBlockChange(clicked.getLocation(), clicked.getBlockData());
+            if (face != null) {
+                Block adjacent = clicked.getRelative(face);
+                event.getPlayer().sendBlockChange(adjacent.getLocation(), adjacent.getBlockData());
+            }
         }
     }
 

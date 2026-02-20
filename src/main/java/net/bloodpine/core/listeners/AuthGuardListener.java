@@ -8,8 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -112,6 +116,35 @@ public class AuthGuardListener implements Listener {
             return;
         }
 
+        if (!plugin.getAuthManager().isAuthenticated(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInteract(PlayerInteractEvent event) {
+        cancelIfNotAuthenticated(event.getPlayer(), event);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) {
+        cancelIfNotAuthenticated(event.getPlayer(), event);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        cancelIfNotAuthenticated(event.getPlayer(), event);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDropItem(PlayerDropItemEvent event) {
+        cancelIfNotAuthenticated(event.getPlayer(), event);
+    }
+
+    private void cancelIfNotAuthenticated(Player player, org.bukkit.event.Cancellable event) {
+        if (!plugin.getAuthManager().isAuthRequired()) {
+            return;
+        }
         if (!plugin.getAuthManager().isAuthenticated(player)) {
             event.setCancelled(true);
         }

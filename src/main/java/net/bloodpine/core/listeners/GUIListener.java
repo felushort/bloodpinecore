@@ -169,7 +169,7 @@ public class GUIListener implements Listener {
 
     private void handleTokenShop(Player player, String itemName) {
         plugin.getTokenShopGUI().handleClick(player, itemName);
-        plugin.getTokenShopGUI().open(player);
+        plugin.getServer().getScheduler().runTask(plugin, () -> plugin.getTokenShopGUI().open(player));
         player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, 1f, 1f);
     }
     

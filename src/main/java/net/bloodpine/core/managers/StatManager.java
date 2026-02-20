@@ -54,27 +54,25 @@ public class StatManager {
     }
     
     public void applyStats(Player player) {
-        if (!plugin.getConfig().getBoolean("lifesteal.enabled", true)) {
-            return;
-        }
-
         PlayerData data = plugin.getDataManager().getPlayerData(player);
-        
+
         // Apply vitality (health)
         int vitalityTokens = data.getAllocatedTokens(StatType.VITALITY);
         double heartsPerToken = plugin.getConfig().getDouble("stats.vitality.per-token", 1.0);
-        
+
         // Base health from config starting hearts
         int startingHearts = plugin.getConfig().getInt("lifesteal.starting-hearts", 10);
         double baseHealth = startingHearts * 2.0; // starting hearts in HP
-        
-        // Lifesteal hearts (each heart = 2 HP)
-        double lifestealHealth = data.getLifestealHearts() * 2.0;
-        
+
+        // Lifesteal hearts only apply when lifesteal is enabled
+        double lifestealHealth = plugin.getConfig().getBoolean("lifesteal.enabled", true)
+                ? data.getLifestealHearts() * 2.0
+                : 0.0;
+
         // Vitality bonus health
         double vitalityHealth = vitalityTokens * heartsPerToken;
         double rebirthHealth = data.getRebirthLevel() * plugin.getRebirthManager().getVitalityHeartsPerLevel() * 2.0;
-        
+
         // Calculate final max health with limits
         double maxHearts = plugin.getConfig().getDouble("lifesteal.max-hearts", 20) * 2.0;
         double minHealth = plugin.getConfig().getDouble("lifesteal.min-hearts", 1) * 2.0;
@@ -82,9 +80,9 @@ public class StatManager {
         double finalHealth = maxHearts <= 0
             ? Math.max(minHealth, computedHealth)
             : Math.max(minHealth, Math.min(maxHearts, computedHealth));
-        
+
         player.getAttribute(Attribute.MAX_HEALTH).setBaseValue(finalHealth);
-        
+
         // Health is clamped to current max
         if (player.getHealth() > player.getAttribute(Attribute.MAX_HEALTH).getValue()) {
             player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());

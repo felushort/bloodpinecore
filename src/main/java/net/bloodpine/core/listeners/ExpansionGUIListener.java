@@ -30,7 +30,6 @@ public class ExpansionGUIListener implements Listener {
                 || title.contains("Daily Quest")
                 || title.contains("Contracts")
                 || title.contains("Bounty Board")
-                || title.contains("Ascension")
                 || title.contains("Economy Sinks")
                 || title.contains("Parkour Challenge")
                 || title.contains("Season Arc")
@@ -112,10 +111,6 @@ public class ExpansionGUIListener implements Listener {
 
         if (title.contains("Bounty Board")) {
             if (clicked.contains("Refresh")) plugin.getExpansionGUIManager().openBountyBoard(player);
-        }
-
-        if (title.contains("Ascension")) {
-            if (clicked.contains("Ascend")) player.performCommand("ascend");
         }
 
         if (title.contains("Economy Sinks")) {
