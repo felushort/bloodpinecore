@@ -4,8 +4,8 @@ import net.bloodpine.core.BloodpineCore;
 import net.bloodpine.core.data.PlayerData;
 import net.bloodpine.core.utils.ItemUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Event;
 import org.bukkit.Sound;
+import org.bukkit.event.Event;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -28,12 +28,6 @@ public class ItemRedeemListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-
-        // Respect auth guard: skip processing for unauthenticated players
-        if (plugin.getAuthManager().isAuthRequired()
-                && !plugin.getAuthManager().isAuthenticated(player)) {
-            return;
-        }
 
         ItemStack item = event.getItem();
         

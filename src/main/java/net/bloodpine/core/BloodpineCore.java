@@ -25,9 +25,6 @@ public class BloodpineCore extends JavaPlugin {
     private GameplayExpansionManager gameplayExpansionManager;
     private ExpansionGUIManager expansionGUIManager;
     private RedeemCodeManager redeemCodeManager;
-    private AuthManager authManager;
-    private AntiVpnManager antiVpnManager;
-    private SessionLocationManager sessionLocationManager;
     private CombatLogListener combatLogListener;
     private StatsGUI statsGUI;
     private LeaderboardGUI leaderboardGUI;
@@ -56,9 +53,6 @@ public class BloodpineCore extends JavaPlugin {
         gameplayExpansionManager = new GameplayExpansionManager(this);
         expansionGUIManager = new ExpansionGUIManager(this);
         redeemCodeManager = new RedeemCodeManager(this);
-        authManager = new AuthManager(this);
-        antiVpnManager = new AntiVpnManager(this);
-        sessionLocationManager = new SessionLocationManager(this);
         combatLogListener = new CombatLogListener(this);
 
         // Security systems
@@ -101,13 +95,6 @@ public class BloodpineCore extends JavaPlugin {
         }
         if (redeemCodeManager != null) {
             redeemCodeManager.save();
-        }
-        if (authManager != null) {
-            authManager.save();
-        }
-        if (sessionLocationManager != null) {
-            sessionLocationManager.saveOnlinePlayers();
-            sessionLocationManager.save();
         }
         
         getLogger().info("Bloodpine Ascension Core has been disabled!");
@@ -161,8 +148,6 @@ public class BloodpineCore extends JavaPlugin {
         if (lifestealEnabled) {
             getCommand("sethearts").setExecutor(new SetHeartsCommand(this));
         }
-        getCommand("register").setExecutor(new RegisterCommand(this));
-        getCommand("login").setExecutor(new LoginCommand(this));
     }
     
     private void registerListeners() {
@@ -182,7 +167,6 @@ public class BloodpineCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ExpansionListener(this), this);
         getServer().getPluginManager().registerEvents(new ExpansionGUIListener(this), this);
         getServer().getPluginManager().registerEvents(new DuplicateNameGuardListener(this), this);
-        getServer().getPluginManager().registerEvents(new AuthGuardListener(this), this);
         // Security + mechanics
         if (opLockManager != null) {
             getServer().getPluginManager().registerEvents(new OpLockListener(opLockManager), this);
@@ -201,12 +185,6 @@ public class BloodpineCore extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             markedManager.checkMarkedPlayers();
         }, 100L, 100L);
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            if (sessionLocationManager != null) {
-                sessionLocationManager.saveOnlinePlayers();
-            }
-        }, 200L, 600L);
 
         gameplayExpansionManager.startSchedulers();
     }
@@ -285,18 +263,6 @@ public class BloodpineCore extends JavaPlugin {
 
     public RedeemCodeManager getRedeemCodeManager() {
         return redeemCodeManager;
-    }
-
-    public AuthManager getAuthManager() {
-        return authManager;
-    }
-
-    public AntiVpnManager getAntiVpnManager() {
-        return antiVpnManager;
-    }
-
-    public SessionLocationManager getSessionLocationManager() {
-        return sessionLocationManager;
     }
 
     public OpLockManager getOpLockManager() {

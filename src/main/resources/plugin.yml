@@ -145,14 +145,6 @@ commands:
     description: Set a player's max hearts
     usage: /sethearts <player> <hearts>
     permission: bloodpine.admin
-  register:
-    description: Register your cracked-mode account password
-    usage: /register <password>
-    aliases: [reg]
-  login:
-    description: Login to your cracked-mode account
-    usage: /login <password>
-    aliases: [l]
 
 permissions:
   bloodpine.admin:

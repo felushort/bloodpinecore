@@ -45,16 +45,10 @@ public class JoinListener implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getExpansionGUIManager().openLearnCenter(event.getPlayer()), 40L);
         }
 
-        if (!plugin.getAuthManager().isAuthRequired()) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> plugin.getSessionLocationManager().restoreLocation(event.getPlayer()), 2L);
-        }
     }
     
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        plugin.getSessionLocationManager().saveLocation(event.getPlayer());
-        plugin.getSessionLocationManager().save();
-
         // Clear display
         plugin.getDisplayManager().clearDisplay(event.getPlayer());
         plugin.getSidebarManager().clearPlayer(event.getPlayer());
