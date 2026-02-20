@@ -21,6 +21,12 @@ public class TotemListener implements Listener {
         if (!(event.getEntity() instanceof Player player)) {
             return;
         }
+
+        if (plugin.getGameplayExpansionManager().isNoTotemZone(player.getLocation())) {
+            event.setCancelled(true);
+            player.sendMessage("§cTotems are disabled in the Blood Zone.");
+            return;
+        }
         
         if (event.isCancelled()) return;
         

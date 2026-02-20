@@ -87,7 +87,7 @@ public class GUIListener implements Listener {
         }
         else if (itemName.contains("Reset")) {
             PlayerData data = plugin.getDataManager().getPlayerData(player);
-            int refunded = data.getTotalAllocatedTokens();
+            int refunded = data.getAllocatedTokenCost();
             
             if (refunded == 0) {
                 player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
@@ -130,11 +130,12 @@ public class GUIListener implements Listener {
         }
         
         if (itemName.contains("+")) {
+            int cost = plugin.getStatManager().getAllocationCost(player, statType, amount);
             boolean success = plugin.getStatManager().allocateTokens(player, statType, amount);
             
             if (success) {
                 player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
-                    "&aAllocated &e" + amount + " token(s) &ato &f" + statType.getDisplayName()));
+                    "&aAllocated &e" + amount + " point(s) &ato &f" + statType.getDisplayName() + " &7for &e" + cost + " tokens"));
                 player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.5f);
                 plugin.getDisplayManager().updateDisplay(player);
                 plugin.getStatsGUI().openAllocateMenu(player, statType);
@@ -144,12 +145,15 @@ public class GUIListener implements Listener {
                 int current = plugin.getStatManager().getAllocatedTokens(player, statType);
                 int max = plugin.getStatManager().getMaxTokensForStat(statType);
                 
-                if (available < amount) {
+                if (cost > 0 && available < cost) {
                     player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
-                        "&cNot enough tokens! You need &e" + amount + " &cbut only have &e" + available));
-                } else if (current + amount > max) {
+                        "&cNot enough tokens! Need &e" + cost + " &ctokens, you only have &e" + available));
+                } else if (max > 0 && current + amount > max) {
                     player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
                         "&cCannot allocate! Max is &e" + max + " &cand you have &e" + current));
+                } else {
+                    player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") +
+                        "&cCannot allocate that many points right now."));
                 }
                 player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
             }

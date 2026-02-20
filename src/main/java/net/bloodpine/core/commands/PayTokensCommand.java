@@ -57,19 +57,23 @@ public class PayTokensCommand implements CommandExecutor {
         PlayerData targetData = plugin.getDataManager().getPlayerData(target);
 
         int senderAvailable = senderData.getAvailableTokens();
-        if (senderAvailable < amount) {
+        double taxRate = plugin.getConfig().getDouble("token-sinks.trade-tax-rate", 0.10);
+        int tax = Math.max(0, (int) Math.ceil(amount * taxRate));
+        int totalCost = amount + tax;
+
+        if (senderAvailable < totalCost) {
             player.sendMessage(colorize("&cYou only have &e" + senderAvailable + " &cavailable tokens to send."));
             return true;
         }
 
         int maxTokens = plugin.getConfig().getInt("tokens.max-total", 50);
-        int targetRoom = maxTokens - targetData.getTotalTokens();
-        if (targetRoom < amount) {
+        int targetRoom = maxTokens <= 0 ? Integer.MAX_VALUE : maxTokens - targetData.getTotalTokens();
+        if (maxTokens > 0 && targetRoom < amount) {
             player.sendMessage(colorize("&c" + target.getName() + " can only receive &e" + Math.max(targetRoom, 0) + "&c more tokens."));
             return true;
         }
 
-        senderData.removeTokens(amount);
+        senderData.removeTokens(totalCost);
         targetData.addTokens(amount);
 
         plugin.getDisplayManager().updateDisplay(player);
@@ -77,7 +81,7 @@ public class PayTokensCommand implements CommandExecutor {
         plugin.getSidebarManager().updatePlayer(player);
         plugin.getSidebarManager().updatePlayer(target);
 
-        player.sendMessage(colorize("&aSent &e" + amount + " &atokens to &f" + target.getName() + "&a."));
+        player.sendMessage(colorize("&aSent &e" + amount + " &atokens to &f" + target.getName() + "&a. &8(Tax: &c" + tax + "&8)"));
         target.sendMessage(colorize("&aReceived &e" + amount + " &atokens from &f" + player.getName() + "&a."));
         return true;
     }

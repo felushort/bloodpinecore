@@ -31,7 +31,7 @@ public class StatsGUI {
         gui.setItem(4, createItem(Material.SUNFLOWER, 
             "&e&lYour Tokens",
             "&7Total: &e" + data.getTotalTokens(),
-            "&7Allocated: &e" + data.getTotalAllocatedTokens(),
+            "&7Allocated Points: &e" + data.getTotalAllocatedTokens(),
             "&7Available: &a" + data.getAvailableTokens(),
             "",
             "&7Earn tokens by killing players!",
@@ -93,16 +93,20 @@ public class StatsGUI {
         gui.setItem(4, getStatItem(statType, data, current, max));
         
         // Allocate buttons
-        if (available >= 1 && current < max) {
-            gui.setItem(10, createItem(Material.LIME_DYE, "&a+1 Token", "&7Click to allocate 1 token"));
+        int cost1 = plugin.getStatManager().getAllocationCost(player, statType, 1);
+        int cost5 = plugin.getStatManager().getAllocationCost(player, statType, 5);
+        int cost10 = plugin.getStatManager().getAllocationCost(player, statType, 10);
+
+        if (cost1 > 0 && available >= cost1) {
+            gui.setItem(10, createItem(Material.LIME_DYE, "&a+1 Point", "&7Cost: &e" + cost1 + " tokens", "&7Click to allocate"));
         }
         
-        if (available >= 5 && current + 5 <= max) {
-            gui.setItem(11, createItem(Material.LIME_DYE, "&a+5 Tokens", "&7Click to allocate 5 tokens"));
+        if (cost5 > 0 && available >= cost5) {
+            gui.setItem(11, createItem(Material.LIME_DYE, "&a+5 Points", "&7Cost: &e" + cost5 + " tokens", "&7Click to allocate"));
         }
         
-        if (available >= 10 && current + 10 <= max) {
-            gui.setItem(12, createItem(Material.LIME_DYE, "&a+10 Tokens", "&7Click to allocate 10 tokens"));
+        if (cost10 > 0 && available >= cost10) {
+            gui.setItem(12, createItem(Material.LIME_DYE, "&a+10 Points", "&7Cost: &e" + cost10 + " tokens", "&7Click to allocate"));
         }
         
         // Back button

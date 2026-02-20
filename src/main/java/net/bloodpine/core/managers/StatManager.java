@@ -16,9 +16,14 @@ public class StatManager {
     
     public boolean allocateTokens(Player player, StatType statType, int amount) {
         PlayerData data = plugin.getDataManager().getPlayerData(player);
+
+        int totalCost = getAllocationCost(player, statType, amount);
+        if (totalCost <= 0) {
+            return false;
+        }
         
         // Check if player has enough available tokens
-        if (data.getAvailableTokens() < amount) {
+        if (data.getAvailableTokens() < totalCost) {
             return false;
         }
         
@@ -26,7 +31,7 @@ public class StatManager {
         int currentAllocation = data.getAllocatedTokens(statType);
         int maxTokens = plugin.getConfig().getInt("stats." + statType.getConfigKey() + ".max-tokens");
         
-        if (currentAllocation + amount > maxTokens) {
+        if (maxTokens > 0 && currentAllocation + amount > maxTokens) {
             return false;
         }
         
@@ -34,6 +39,7 @@ public class StatManager {
         for (int i = 0; i < amount; i++) {
             data.allocateToken(statType);
         }
+        data.addAllocatedTokenCost(totalCost);
         
         // Apply stat changes
         applyStats(player);
@@ -48,6 +54,10 @@ public class StatManager {
     }
     
     public void applyStats(Player player) {
+        if (!plugin.getConfig().getBoolean("lifesteal.enabled", true)) {
+            return;
+        }
+
         PlayerData data = plugin.getDataManager().getPlayerData(player);
         
         // Apply vitality (health)
@@ -68,7 +78,10 @@ public class StatManager {
         // Calculate final max health with limits
         double maxHearts = plugin.getConfig().getDouble("lifesteal.max-hearts", 20) * 2.0;
         double minHealth = plugin.getConfig().getDouble("lifesteal.min-hearts", 1) * 2.0;
-        double finalHealth = Math.max(minHealth, Math.min(maxHearts, baseHealth + lifestealHealth + vitalityHealth + rebirthHealth));
+        double computedHealth = baseHealth + lifestealHealth + vitalityHealth + rebirthHealth;
+        double finalHealth = maxHearts <= 0
+            ? Math.max(minHealth, computedHealth)
+            : Math.max(minHealth, Math.min(maxHearts, computedHealth));
         
         player.getAttribute(Attribute.MAX_HEALTH).setBaseValue(finalHealth);
         
@@ -84,7 +97,12 @@ public class StatManager {
         double percentPerToken = plugin.getConfig().getDouble("stats.damage.per-token", 1.0);
         double tokenMultiplier = 1.0 + (damageTokens * percentPerToken / 100.0);
         double rebirthMultiplier = 1.0 + (data.getRebirthLevel() * plugin.getRebirthManager().getDamageBonusPerLevel());
-        return tokenMultiplier * rebirthMultiplier;
+        int bloodForgeLevel = data.getBloodForgeLevel();
+        double forgeBonusPerLevel = plugin.getConfig().getDouble("blood-forge.damage-bonus-per-level", 0.01);
+        int forgeCap = Math.max(0, plugin.getConfig().getInt("blood-forge.max-level", 10));
+        int effectiveForgeLevel = forgeCap > 0 ? Math.min(forgeCap, bloodForgeLevel) : bloodForgeLevel;
+        double forgeMultiplier = 1.0 + (effectiveForgeLevel * forgeBonusPerLevel);
+        return tokenMultiplier * rebirthMultiplier * forgeMultiplier;
     }
     
     public double getDefenseMultiplier(Player player) {
@@ -119,5 +137,35 @@ public class StatManager {
     
     public int getMaxTokensForStat(StatType statType) {
         return plugin.getConfig().getInt("stats." + statType.getConfigKey() + ".max-tokens", 10);
+    }
+
+    public int getPointCost(Player player, StatType statType) {
+        PlayerData data = plugin.getDataManager().getPlayerData(player);
+        int currentAllocation = data.getAllocatedTokens(statType);
+        int baseCost = Math.max(1, plugin.getConfig().getInt("stats.allocation-cost.base", 1));
+        int increasePerPoint = Math.max(0, plugin.getConfig().getInt("stats.allocation-cost.increase-per-point", 1));
+        return baseCost + (currentAllocation * increasePerPoint);
+    }
+
+    public int getAllocationCost(Player player, StatType statType, int amount) {
+        if (amount <= 0) {
+            return 0;
+        }
+
+        int maxTokens = getMaxTokensForStat(statType);
+        int currentAllocation = getAllocatedTokens(player, statType);
+        if (maxTokens > 0 && currentAllocation + amount > maxTokens) {
+            return 0;
+        }
+
+        int baseCost = Math.max(1, plugin.getConfig().getInt("stats.allocation-cost.base", 1));
+        int increasePerPoint = Math.max(0, plugin.getConfig().getInt("stats.allocation-cost.increase-per-point", 1));
+
+        int totalCost = 0;
+        for (int i = 0; i < amount; i++) {
+            totalCost += baseCost + ((currentAllocation + i) * increasePerPoint);
+        }
+
+        return totalCost;
     }
 }

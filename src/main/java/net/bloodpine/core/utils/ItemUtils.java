@@ -74,6 +74,34 @@ public class ItemUtils {
     }
 
     /**
+     * Create a temporary stat boost scroll item.
+     */
+    public static ItemStack createStatBoostScroll(int amount) {
+        ItemStack item = new ItemStack(Material.PAPER, amount);
+        ItemMeta meta = item.getItemMeta();
+
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD + "Stat Boost Scroll");
+
+            List<String> lore = new ArrayList<>();
+            lore.add("");
+            lore.add(ChatColor.GRAY + "A volatile blood-ink scroll.");
+            lore.add(ChatColor.GRAY + "Right-click to gain short combat buffs.");
+            lore.add("");
+            lore.add(ChatColor.LIGHT_PURPLE + "Strength I + Regeneration I (60s)");
+            lore.add("");
+            lore.add(ChatColor.DARK_GRAY + "Bloodpine Event Loot");
+
+            meta.setLore(lore);
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            item.setItemMeta(meta);
+        }
+
+        return item;
+    }
+
+    /**
      * Check if an ItemStack is a Token item
      */
     public static boolean isTokenItem(ItemStack item) {
@@ -105,5 +133,22 @@ public class ItemUtils {
         
         String displayName = ChatColor.stripColor(meta.getDisplayName());
         return displayName.contains("Bloodpine Heart");
+    }
+
+    /**
+     * Check if an ItemStack is a stat boost scroll item.
+     */
+    public static boolean isStatBoostScroll(ItemStack item) {
+        if (item == null || item.getType() != Material.PAPER) {
+            return false;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasDisplayName()) {
+            return false;
+        }
+
+        String displayName = ChatColor.stripColor(meta.getDisplayName());
+        return displayName.equalsIgnoreCase("Stat Boost Scroll");
     }
 }

@@ -26,7 +26,7 @@ public class ResetStatsCommand implements CommandExecutor {
         Player player = (Player) sender;
         PlayerData data = plugin.getDataManager().getPlayerData(player);
         
-        int refundedTokens = data.getTotalAllocatedTokens();
+        int refundedTokens = data.getAllocatedTokenCost();
         
         if (refundedTokens == 0) {
             sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 

@@ -17,14 +17,12 @@ public class TokenManager {
         PlayerData data = plugin.getDataManager().getPlayerData(player);
         int currentTokens = data.getTotalTokens();
         int maxTokens = plugin.getConfig().getInt("tokens.max-total", 50);
-        
-        int tokensToGive = Math.min(amount, maxTokens - currentTokens);
-        
-        if (tokensToGive <= 0) {
-            player.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
-                "&cYou've reached the maximum token limit!"));
-            return;
-        }
+
+        int tokensToGive = maxTokens <= 0
+            ? amount
+            : Math.min(amount, maxTokens - currentTokens);
+
+        if (tokensToGive <= 0) return;
         
         data.addTokens(tokensToGive);
         
@@ -53,7 +51,7 @@ public class TokenManager {
     public void setTokens(Player player, int amount) {
         PlayerData data = plugin.getDataManager().getPlayerData(player);
         int maxTokens = plugin.getConfig().getInt("tokens.max-total", 50);
-        data.setTotalTokens(Math.min(amount, maxTokens));
+        data.setTotalTokens(maxTokens <= 0 ? amount : Math.min(amount, maxTokens));
     }
     
     public int getTokens(Player player) {
@@ -70,15 +68,17 @@ public class TokenManager {
         int tokensPerKill = plugin.getConfig().getInt("tokens.per-kill", 1);
         
         // Apply boost multiplier if active
-        int multiplier = plugin.getBoostManager().getTokenMultiplier(killer);
-        int totalTokens = tokensPerKill * multiplier;
+        int boostMultiplier = plugin.getBoostManager().getTokenMultiplier(killer);
+        double eventMultiplier = plugin.getGameplayExpansionManager().getKillTokenMultiplier(killer, victim);
+        int totalTokens = Math.max(1, (int) Math.round(tokensPerKill * boostMultiplier * eventMultiplier));
         
         // Add tokens to killer
         giveTokens(killer, totalTokens);
         
         // Send message to killer
-        String boostMsg = multiplier > 1 ? " &6&l(2x BOOST!)" : "";
-        String message = "&aYou earned &e" + totalTokens + " Token(s) &afrom killing &f" + victim.getName() + "&a!" + boostMsg;
+        String boostMsg = boostMultiplier > 1 ? " &6&l(2x BOOST!)" : "";
+        String eventMsg = eventMultiplier > 1.05 ? " &c&l(EVENT BONUS)" : "";
+        String message = "&aYou earned &e" + totalTokens + " Token(s) &afrom killing &f" + victim.getName() + "&a!" + boostMsg + eventMsg;
         killer.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + message));
         
         // Increment kill counter
@@ -98,7 +98,7 @@ public class TokenManager {
                 "&cYou lost &e" + penalty + " tokens &cfor dying while marked!"));
             
             // Give bonus to killer (also boosted)
-            int bonusTokens = penalty * multiplier;
+            int bonusTokens = Math.max(1, (int) Math.round(penalty * boostMultiplier * eventMultiplier));
             killer.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
                 "&a&lBONUS! &aYou killed a marked player and earned &e" + bonusTokens + " extra tokens!" + boostMsg));
             giveTokens(killer, bonusTokens);

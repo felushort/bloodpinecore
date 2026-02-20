@@ -1,5 +1,5 @@
 name: BloodpineCore
-version: '1.0.0'
+version: '1.0.1'
 main: net.bloodpine.core.BloodpineCore
 api-version: '1.21'
 author: Bloodpine
@@ -52,6 +52,14 @@ commands:
     description: Open the in-game token shop
     usage: /tshop
     aliases: [tokenshop, shop]
+  bloodforge:
+    description: Upgrade your permanent Blood Forge damage bonus
+    usage: /bloodforge [info|forge]
+    aliases: [forge]
+  heartinsurance:
+    description: Buy one-time heart insurance charges
+    usage: /heartinsurance [info|buy <amount>]
+    aliases: [insureheart, hinsurance]
   paytokens:
     description: Send your available tokens to another player
     usage: /paytokens <player> <amount>
@@ -68,6 +76,9 @@ commands:
     description: Open the in-game Bloodpine guide book
     usage: /guide
     aliases: [helpbook, handbook]
+  store:
+    description: Show the Bloodpine web store link
+    usage: /store
   givetokenitem:
     description: Give physical token items to a player
     usage: /givetokenitem <player> [amount]
@@ -78,6 +89,70 @@ commands:
     usage: /giveheartitem <player> [amount]
     permission: bloodpine.admin
     aliases: [giveheartitem]
+  events:
+    description: View or manage live server events
+    usage: /events start <bloodmoon|arena|hunt|boss|finalhour|supplydrop> | /events stop <bloodmoon|arena|hunt|boss|finalhour|all>
+  blackmarket:
+    description: Access the black market systems
+    usage: /blackmarket [illegalbook|riskybuff|combatperk]
+  pvpstats:
+    description: View live PvP statistics and leaderboards
+    usage: /pvpstats [player|leaderboard]
+  gamble:
+    description: Gamble your tokens
+    usage: /gamble <amount>
+  combatcrate:
+    description: Open a combat crate with token cost
+    usage: /combatcrate
+    aliases: [ccrate]
+  dailyquest:
+    description: Daily spawn quest progress and rewards
+    usage: /dailyquest [claim]
+  contract:
+    description: Get assassination contracts
+    usage: /contract [new]
+  bountyboard:
+    description: View top bounty targets
+    usage: /bountyboard
+  parkour:
+    description: Spawn parkour challenge timer
+    usage: /parkour <start|finish>
+  season:
+    description: View current seasonal story arc
+    usage: /season
+  ascend:
+    description: Ascend after high rebirth progression
+    usage: /ascend [info]
+  combatreplay:
+    description: View recent incoming combat damage breakdown
+    usage: /combatreplay
+  hub:
+    description: Open Bloodpine feature hub
+    usage: /hub
+    aliases: [bphub]
+  learn:
+    description: Open new player tutorial center
+    usage: /learn
+    aliases: [tutorial, bphelp]
+  redeem:
+    description: Redeem a one-time server reward code
+    usage: /redeem <code>
+  redeemadmin:
+    description: Manage redeemable reward codes
+    usage: /redeemadmin <create|delete|list>
+    permission: bloodpine.admin
+  sethearts:
+    description: Set a player's max hearts
+    usage: /sethearts <player> <hearts>
+    permission: bloodpine.admin
+  register:
+    description: Register your cracked-mode account password
+    usage: /register <password>
+    aliases: [reg]
+  login:
+    description: Login to your cracked-mode account
+    usage: /login <password>
+    aliases: [l]
 
 permissions:
   bloodpine.admin:

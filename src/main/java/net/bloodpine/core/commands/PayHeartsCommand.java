@@ -67,7 +67,7 @@ public class PayHeartsCommand implements CommandExecutor {
 
         double targetProjected = projectedHealth(targetData, amount);
         double targetMaximum = plugin.getConfig().getDouble("lifesteal.max-hearts", 20.0) * 2.0;
-        if (targetProjected > targetMaximum) {
+        if (targetMaximum > 0 && targetProjected > targetMaximum) {
             int maxReceivable = maxHeartsTargetCanReceive(targetData);
             player.sendMessage(colorize("&c" + target.getName() + " can only receive &e" + Math.max(maxReceivable, 0) + " &cmore hearts."));
             return true;
@@ -94,6 +94,9 @@ public class PayHeartsCommand implements CommandExecutor {
 
     private int maxHeartsTargetCanReceive(PlayerData targetData) {
         double maximum = plugin.getConfig().getDouble("lifesteal.max-hearts", 20.0) * 2.0;
+        if (maximum <= 0) {
+            return Integer.MAX_VALUE;
+        }
         double currentBase = projectedHealth(targetData, 0);
         return (int) Math.floor((maximum - currentBase) / 2.0);
     }

@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class ItemRedeemListener implements Listener {
 
@@ -41,7 +43,19 @@ public class ItemRedeemListener implements Listener {
         // Check if it's a Heart item
         if (ItemUtils.isHeartItem(item)) {
             event.setCancelled(true);
+            if (!plugin.getConfig().getBoolean("lifesteal.enabled", true)) {
+                player.sendMessage(colorize("&cBloodpine heart items are currently disabled."));
+                player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
+                return;
+            }
             redeemHeart(player, item);
+            return;
+        }
+
+        // Check if it's a Stat Boost Scroll
+        if (ItemUtils.isStatBoostScroll(item)) {
+            event.setCancelled(true);
+            redeemStatBoostScroll(player, item);
             return;
         }
     }
@@ -53,9 +67,9 @@ public class ItemRedeemListener implements Listener {
         // Check if player can receive tokens
         int currentTokens = data.getTotalTokens();
         int maxTokens = plugin.getConfig().getInt("tokens.max-total", 50);
-        int availableSpace = maxTokens - currentTokens;
-        
-        if (availableSpace <= 0) {
+        int availableSpace = maxTokens <= 0 ? Integer.MAX_VALUE : maxTokens - currentTokens;
+
+        if (maxTokens > 0 && availableSpace <= 0) {
             player.sendMessage(colorize("&cYou've reached the maximum token limit! &7(" + maxTokens + " tokens)"));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
@@ -95,9 +109,9 @@ public class ItemRedeemListener implements Listener {
         // Check if player can receive hearts
         double maxHearts = plugin.getConfig().getDouble("lifesteal.max-hearts", 20.0);
         double currentHearts = data.getLifestealHearts();
-        double availableSpace = maxHearts - currentHearts;
-        
-        if (availableSpace <= 0) {
+        double availableSpace = maxHearts <= 0 ? Double.MAX_VALUE : maxHearts - currentHearts;
+
+        if (maxHearts > 0 && availableSpace <= 0) {
             player.sendMessage(colorize("&cYou've reached the maximum heart limit! &7(" + (int)maxHearts + " hearts)"));
             player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
             return;
@@ -133,6 +147,19 @@ public class ItemRedeemListener implements Listener {
         // Update displays
         plugin.getDisplayManager().updateDisplay(player);
         plugin.getSidebarManager().updatePlayer(player);
+    }
+
+    private void redeemStatBoostScroll(Player player, ItemStack item) {
+        int amount = item.getAmount();
+        if (amount <= 0) {
+            return;
+        }
+
+        item.setAmount(amount - 1);
+        player.addPotionEffect(new PotionEffect(PotionEffectType.STRENGTH, 20 * 60, 0, true, true, true));
+        player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 20 * 60, 0, true, true, true));
+        player.sendMessage(colorize("&d&l✦ Stat Boost activated &7(Strength I + Regeneration I for 60s)"));
+        player.playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1f, 1.2f);
     }
 
     private String colorize(String message) {

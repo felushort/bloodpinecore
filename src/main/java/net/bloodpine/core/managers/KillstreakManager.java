@@ -36,22 +36,29 @@ public class KillstreakManager {
         
         lastKillTime.put(uuid, currentTime);
         int streak = killstreaks.get(uuid);
-        
-        // Broadcast killstreaks at milestones
-        if (streak == 3) {
-            broadcastKillstreak(killer, "TRIPLE KILL", Sound.ENTITY_ENDER_DRAGON_GROWL);
-        } else if (streak == 5) {
-            broadcastKillstreak(killer, "KILLING SPREE", Sound.ENTITY_WITHER_SPAWN);
-            giveStreakBonus(killer, 1);
+        plugin.getDataManager().getPlayerData(killer).recordKillstreak(streak);
+
+        if (streak == 5) {
+            int bonusTokens = plugin.getConfig().getInt("killstreak.bonus-at-5", 2);
+            plugin.getTokenManager().giveTokens(killer, bonusTokens);
+            killer.sendMessage(colorize("&6Killstreak &7» &a5 streak reached: &e+" + bonusTokens + " tokens"));
+            killer.playSound(killer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.3f);
         } else if (streak == 10) {
-            broadcastKillstreak(killer, "RAMPAGE", Sound.ENTITY_ENDER_DRAGON_DEATH);
-            giveStreakBonus(killer, 2);
+            int glowSeconds = plugin.getConfig().getInt("killstreak.glow-seconds-at-10", 30);
+            int regenSeconds = plugin.getConfig().getInt("killstreak.regen-seconds-at-10", 30);
+
+            killer.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.GLOWING, glowSeconds * 20, 0, true, false, true));
+            killer.addPotionEffect(new org.bukkit.potion.PotionEffect(
+                    org.bukkit.potion.PotionEffectType.REGENERATION, regenSeconds * 20, 0, true, true, true));
+
+            killer.sendMessage(colorize("&dKillstreak &7» &a10 streak: temporary glow + regen activated"));
+            killer.playSound(killer.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1f);
         } else if (streak == 15) {
-            broadcastKillstreak(killer, "UNSTOPPABLE", Sound.ENTITY_WITHER_DEATH);
-            giveStreakBonus(killer, 3);
-        } else if (streak == 20) {
-            broadcastKillstreak(killer, "GODLIKE", Sound.ENTITY_LIGHTNING_BOLT_THUNDER);
-            giveStreakBonus(killer, 5);
+            Bukkit.broadcastMessage(colorize("&c&lKILLSTREAK &7» &f" + killer.getName() + " reached a &c15 kill streak&7!"));
+            for (Player online : Bukkit.getOnlinePlayers()) {
+                online.playSound(online.getLocation(), Sound.ENTITY_WITHER_SPAWN, 0.8f, 1f);
+            }
         }
     }
     
@@ -79,21 +86,6 @@ public class KillstreakManager {
     public void clearPlayerState(UUID uuid) {
         killstreaks.remove(uuid);
         lastKillTime.remove(uuid);
-    }
-    
-    private void broadcastKillstreak(Player player, String streakName, Sound sound) {
-        String message = colorize("&c&l" + player.getName() + " &e&lis on a &c&l" + streakName + "&e&l!");
-        Bukkit.broadcastMessage(message);
-        
-        // Play sound to all players
-        for (Player online : Bukkit.getOnlinePlayers()) {
-            online.playSound(online.getLocation(), sound, 1f, 1f);
-        }
-    }
-    
-    private void giveStreakBonus(Player player, int bonusTokens) {
-        plugin.getTokenManager().giveTokens(player, bonusTokens);
-        player.sendMessage(colorize("&a&lSTREAK BONUS! &e+" + bonusTokens + " tokens!"));
     }
     
     private String colorize(String message) {

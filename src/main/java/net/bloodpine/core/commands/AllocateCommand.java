@@ -59,6 +59,7 @@ public class AllocateCommand implements CommandExecutor {
             }
         }
         
+        int totalCost = plugin.getStatManager().getAllocationCost(player, statType, amount);
         boolean success = plugin.getStatManager().allocateTokens(player, statType, amount);
         
         if (!success) {
@@ -66,21 +67,22 @@ public class AllocateCommand implements CommandExecutor {
             int current = plugin.getStatManager().getAllocatedTokens(player, statType);
             int max = plugin.getStatManager().getMaxTokensForStat(statType);
             
-            if (available < amount) {
-                sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + 
-                    plugin.getConfig().getString("messages.insufficient-tokens")));
-            } else if (current + amount > max) {
+            if (totalCost > 0 && available < totalCost) {
+                sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") +
+                    "&cNot enough tokens! Need &e" + totalCost + " &ctokens, you have &e" + available));
+            } else if (max > 0 && current + amount > max) {
                 String msg = plugin.getConfig().getString("messages.max-stat")
                     .replace("{stat}", statType.getDisplayName());
                 sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + msg));
+            } else {
+                sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") +
+                    "&cCannot allocate that amount right now."));
             }
             return true;
         }
         
-        String message = plugin.getConfig().getString("messages.stat-allocated")
-            .replace("{amount}", String.valueOf(amount))
-            .replace("{stat}", statType.getDisplayName());
-        sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") + message));
+        sender.sendMessage(colorize(plugin.getConfig().getString("messages.prefix") +
+            "&aAllocated &e" + amount + " point(s) &ato &f" + statType.getDisplayName() + " &7for &e" + totalCost + " tokens"));
         
         // Update display
         plugin.getDisplayManager().updateDisplay(player);

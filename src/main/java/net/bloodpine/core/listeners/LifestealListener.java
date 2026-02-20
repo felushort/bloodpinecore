@@ -37,11 +37,21 @@ public class LifestealListener implements Listener {
         
         // Check for heart shield on victim
         boolean victimShielded = plugin.getBoostManager().consumeHeartShield(victim);
-        
+        boolean victimInsured = false;
+
         if (!victimShielded) {
-            victimData.removeLifestealHeart();
+            victimInsured = victimData.consumeInsuredHeart();
+            if (!victimInsured) {
+                victimData.removeLifestealHeart();
+
+                int extraLoss = plugin.getGameplayExpansionManager().getExtraHeartLossInBloodZone(victim.getLocation());
+                for (int i = 0; i < extraLoss; i++) {
+                    victimData.removeLifestealHeart();
+                }
+            }
         }
         killerData.addLifestealHeart();
+        plugin.getExpansionDataManager().getProfile(killer).addHeartsGainedSeason(1);
         
         // Apply stats (this recalculates max health properly)
         plugin.getStatManager().applyStats(victim);
@@ -52,7 +62,13 @@ public class LifestealListener implements Listener {
         double newKillerHealth = killer.getAttribute(Attribute.MAX_HEALTH).getBaseValue();
         
         // Messages
-        victim.sendMessage(colorize("&c&l💔 You lost a heart! &7(" + (newVictimHealth / 2.0) + " hearts remaining)"));
+        if (victimShielded) {
+            victim.sendMessage(colorize("&6&l🛡 Heart Shield saved your heart this death."));
+        } else if (victimInsured) {
+            victim.sendMessage(colorize("&b&l☂ Heart Insurance triggered. Your insured heart was consumed."));
+        } else {
+            victim.sendMessage(colorize("&c&l💔 You lost a heart! &7(" + (newVictimHealth / 2.0) + " hearts remaining)"));
+        }
         killer.sendMessage(colorize("&a&l❤ You gained a heart! &7(" + (newKillerHealth / 2.0) + " hearts total)"));
         
         // Check if victim is eliminated (1 heart = 2.0 health)

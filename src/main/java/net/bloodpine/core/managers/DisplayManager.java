@@ -65,9 +65,11 @@ public class DisplayManager {
         if (data.isMarked()) {
             display = ChatColor.RED + "⚠ " + display + ChatColor.RED + " ⚠";
         }
-        
+
         // Set player display name with stats
-        player.setPlayerListName(colorize("&f" + player.getName() + " &7[" + display + "&7]"));
+        String title = plugin.getGameplayExpansionManager().getPlayerTitle(player);
+        String nameColor = plugin.getGameplayExpansionManager().getTabNameColor(player);
+        player.setPlayerListName(colorize(title + " " + nameColor + player.getName() + " &7[" + display + "&7]"));
         
         // Update team prefix/suffix for nametag
         String teamName = "bp_" + player.getName().substring(0, Math.min(12, player.getName().length()));

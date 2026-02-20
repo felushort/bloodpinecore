@@ -29,7 +29,6 @@ public class TokenShopGUI {
         int heartShieldCost = plugin.getConfig().getInt("token-shop.heart-shield-cost", 8);
         int tokenBoostCost = plugin.getConfig().getInt("token-shop.token-boost-30m-cost", 10);
         int killEffectCost = plugin.getConfig().getInt("token-shop.kill-effect-30m-cost", 6);
-        int extraHeartCost = plugin.getConfig().getInt("token-shop.extra-heart-cost", 15);
         int warriorKitCost = plugin.getConfig().getInt("token-shop.warrior-kit-cost", 20);
         int fullHealCost = plugin.getConfig().getInt("token-shop.full-heal-cost", 5);
 
@@ -38,7 +37,6 @@ public class TokenShopGUI {
         gui.setItem(10, shopItem(Material.TOTEM_OF_UNDYING, "&aHeart Shield x1", heartShieldCost, "&7Protects one death from heart loss."));
         gui.setItem(11, shopItem(Material.BLAZE_POWDER, "&6Token Boost 2x (30m)", tokenBoostCost, "&7Double token gain for 30 minutes."));
         gui.setItem(12, shopItem(Material.LIGHTNING_ROD, "&eKill Effect (30m)", killEffectCost, "&7Lightning strike effect on kills."));
-        gui.setItem(14, shopItem(Material.GOLDEN_APPLE, "&c+1 Extra Heart", extraHeartCost, "&7Permanent +1 heart."));
         gui.setItem(15, shopItem(Material.DIAMOND_SWORD, "&bWarrior Kit", warriorKitCost, "&7Instant warrior kit."));
         gui.setItem(16, shopItem(Material.COOKED_BEEF, "&aFull Heal", fullHealCost, "&7Refill health and food."));
 
@@ -63,13 +61,6 @@ public class TokenShopGUI {
         if (plainName.equalsIgnoreCase("Kill Effect (30m)")) {
             if (purchase(player, plugin.getConfig().getInt("token-shop.kill-effect-30m-cost", 6))) {
                 plugin.getBoostManager().giveKillEffect(player, 30);
-            }
-            return;
-        }
-
-        if (plainName.equalsIgnoreCase("+1 Extra Heart")) {
-            if (purchase(player, plugin.getConfig().getInt("token-shop.extra-heart-cost", 15))) {
-                plugin.getBoostManager().giveExtraHearts(player, 1);
             }
             return;
         }

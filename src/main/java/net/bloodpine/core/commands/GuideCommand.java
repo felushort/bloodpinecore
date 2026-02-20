@@ -32,7 +32,7 @@ public class GuideCommand implements CommandExecutor {
         pages.add(colorize(
                 "&c&lBLOODPINE GUIDE\n\n" +
                 "&7Welcome to Bloodpine.\n\n" +
-                "&fThis book covers everything you need to know to survive, progress, and avoid punishments.\n\n" +
+                "&fThis book covers launch-ready systems, progression, and must-know commands.\n\n" +
                 "&8Use /guide anytime."
         ));
 
@@ -82,10 +82,21 @@ public class GuideCommand implements CommandExecutor {
         ));
 
         pages.add(colorize(
+                "&c&lEVENTS (LIVE)\n\n" +
+                "&7• Blood Moon\n" +
+                "&7• Hunt Marked\n" +
+                "&7• Arena\n" +
+                "&7• Blood Tyrant (world boss)\n\n" +
+                "&fExtra custom bosses are disabled for release stability.\n" +
+                "&fUse /events for status."
+        ));
+
+        pages.add(colorize(
                 "&c&lWORLD / SAFETY\n\n" +
                 "&7• Huge spawn safe-zone prevents spawn-killing\n" +
                 "&7• The End is locked until staff opens it\n" +
-                "&7• Premium accounts only\n\n" +
+                "&7• Premium accounts only\n" +
+                "&7• Public release mode is enabled\n\n" +
                 "&fIf something looks bugged, report it instead of abusing it."
         ));
 
@@ -98,7 +109,20 @@ public class GuideCommand implements CommandExecutor {
                 "&f/bounty &7- Bounty system\n" +
                 "&f/paytokens &7- Send available tokens\n" +
                 "&f/payhearts &7- Send hearts\n" +
+                "&f/events &7- Event panel + status\n" +
+                "&f/hub &7- Main feature hub\n" +
+                "&f/learn &7- New player walkthrough\n" +
+                "&f/redeem <code> &7- Redeem launch codes\n" +
                 "&f/guide &7- Open this book"
+        ));
+
+        pages.add(colorize(
+                "&c&lLAUNCH CODE\n\n" +
+                "&fUse code: &aRELEASE\n\n" +
+                "&7Command:\n" +
+                "&f/redeem RELEASE\n\n" +
+                "&7One-time reward per player.\n\n" +
+                "&8Staff: /redeemadmin create <code> [tokens] [hearts] [totems] [gapples] [xp]"
         ));
 
         pages.add(colorize(

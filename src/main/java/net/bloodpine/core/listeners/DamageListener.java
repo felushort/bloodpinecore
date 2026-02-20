@@ -51,7 +51,8 @@ public class DamageListener implements Listener {
         if (attacker.equals(victim)) return;
 
         // Massive spawn safe-zone: block PvP near spawn to prevent spawn killing
-        if (isInSpawnSafeZone(attacker) || isInSpawnSafeZone(victim)) {
+        if (!plugin.getGameplayExpansionManager().areSafeZonesDisabled()
+                && (isInSpawnSafeZone(attacker) || isInSpawnSafeZone(victim))) {
             event.setCancelled(true);
             attacker.sendMessage("§cPvP is disabled in the spawn safe-zone.");
             return;
@@ -70,6 +71,15 @@ public class DamageListener implements Listener {
         // Apply victim's defense multiplier
         double defenseMultiplier = plugin.getStatManager().getDefenseMultiplier(victim);
         damage *= defenseMultiplier;
+
+        // Team-balance proximity modifier (solo boost / nearby ally nerf)
+        damage *= plugin.getGameplayExpansionManager().getDamageModifier(attacker);
+
+        // High-risk blood zone damage multiplier
+        if (plugin.getGameplayExpansionManager().isInBloodZone(attacker.getLocation())
+                || plugin.getGameplayExpansionManager().isInBloodZone(victim.getLocation())) {
+            damage *= plugin.getConfig().getDouble("high-risk-zone.damage-multiplier", 2.0);
+        }
         
         // Set the modified damage
         event.setDamage(damage);

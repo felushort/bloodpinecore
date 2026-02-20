@@ -38,6 +38,8 @@ public class StatsCommand implements CommandExecutor {
         }
         
         PlayerData data = plugin.getDataManager().getPlayerData(target);
+        net.bloodpine.core.managers.ExpansionDataManager.ExpansionProfile profile =
+                plugin.getExpansionDataManager().getProfile(target);
         
         sender.sendMessage(colorize("&c&m-----&r &c&l" + target.getName() + "'s Stats &c&m-----"));
         sender.sendMessage(colorize("&7Tokens: &e" + data.getAvailableTokens() + " &7available / &e" + 
@@ -66,7 +68,12 @@ public class StatsCommand implements CommandExecutor {
         sender.sendMessage("");
         sender.sendMessage(colorize("&7Kills: &e" + data.getTotalKills() + " &7| Deaths: &e" + 
             data.getTotalDeaths() + " &7| K/D: &e" + String.format("%.2f", data.getKDRatio())));
-        
+        sender.sendMessage(colorize("&7Assists: &e" + data.getTotalAssists() + " &7| Longest Streak: &e" + data.getLongestKillstreak()));
+        sender.sendMessage(colorize("&7Hearts Gained (Season): &c" + profile.getHeartsGainedSeason()
+                + " &7| Contracts Completed: &e" + profile.getContractsCompletedTotal()));
+        sender.sendMessage(colorize("&7Blood Forge: &6Lv." + data.getBloodForgeLevel()
+                + " &7| Insured Hearts: &b" + data.getInsuredHearts()));
+
         if (data.isMarked()) {
             sender.sendMessage(colorize("&c&l⚠ MARKED ⚠"));
         }

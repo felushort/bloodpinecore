@@ -4,8 +4,8 @@
 tokens:
   # Tokens earned per kill
   per-kill: 1
-  # Maximum total tokens a player can have
-  max-total: 50
+  # Maximum total tokens a player can have (<= 0 = unlimited)
+  max-total: -1
   # Tokens lost on death when marked
   marked-death-penalty: 5
 
@@ -26,6 +26,9 @@ stats:
   vitality:
     per-token: 2.0   # 1 heart (2 HP) per token
     max-tokens: 8    # +8 hearts max
+  allocation-cost:
+    base: 1
+    increase-per-point: 1
 
 # Marked/Hunted System
 marked:
@@ -53,11 +56,71 @@ season:
   length: 30
   # Auto-reset on season end
   auto-reset: true
+  # Enable automatic season lifecycle checks
+  lifecycle-enabled: true
+  # Reset season-only counters when a new season starts
+  reset-season-counters-on-rollover: true
+  final-hour:
+    enabled: true
+    duration-minutes: 60
+    token-multiplier: 2.0
+    disable-safe-zones: true
+    blood-zone-global: true
+
+# Killstreak tuning
+killstreak:
+  bonus-at-5: 2
+  glow-seconds-at-10: 30
+  regen-seconds-at-10: 30
+
+# Assist reward system
+assists:
+  enabled: true
+  min-damage-share: 0.30
+  reward-multiplier: 0.5
+  window-seconds: 20
+
+# Clutch rewards for outnumbered wins
+clutch:
+  enabled: true
+  min-damage-per-attacker: 4.0
+  tokens-vs-2: 2
+  tokens-vs-3: 4
+
+# Extra kill bonus systems
+bonus-kills:
+  enabled: true
+  revenge:
+    enabled: true
+    window-seconds: 600
+    tokens: 3
+    broadcast: true
+  underdog:
+    enabled: true
+    min-token-gap: 10
+    tokens: 2
+  last-stand:
+    enabled: true
+    max-hearts: 4.0
+    tokens: 2
+  blood-zone:
+    enabled: true
+    tokens: 1
+  combo:
+    enabled: true
+    window-seconds: 45
+    max-stacks: 5
+    tokens-per-stack: 1
+    announce-at: 4
+    frenzy-threshold: 4
+    frenzy-seconds: 12
+    frenzy-speed-level: 1
+    frenzy-resistance-level: 0
 
 # Lifesteal Settings
 lifesteal:
   # Enable lifesteal mechanics
-  enabled: true
+  enabled: false
   # Starting hearts for new players
   starting-hearts: 10
   # Hearts lost per death
@@ -65,7 +128,7 @@ lifesteal:
   # Hearts gained per kill
   hearts-per-kill: 1
   # Maximum hearts a player can have
-  max-hearts: 20
+  max-hearts: 22
   # Minimum hearts before elimination
   min-hearts: 1
   # Ban eliminated players until next season
@@ -118,3 +181,229 @@ messages:
   insufficient-tokens: "&cYou don't have enough tokens!"
   max-stat: "&cYou've reached the maximum for {stat}!"
   reset-stats: "&aYour stats have been reset! &e{tokens} tokens &arefunded."
+
+# Structured PvP Events
+events:
+  blood-moon:
+    interval-minutes: 90
+    duration-minutes: 20
+  arena:
+    world: "world"
+    x1: -100
+    z1: -100
+    x2: 100
+    z2: 100
+  hunt-marked:
+    interval-minutes: 90
+    duration-minutes: 20
+    marked-kill-multiplier: 1.75
+  random-world:
+    enabled: true
+    interval-minutes: 30
+    world: "world"
+    spread: 1500
+    marked-invincible-seconds: 20
+    rogue-assassin-token-reward: 10
+    titan:
+      enabled: true
+      health: 600.0
+      damage: 18.0
+      block-break-radius: 2
+      shake-radius: 50.0
+      shake-cooldown-millis: 800
+      reward-tokens: 35
+    elites:
+      abyss-stalker:
+        health: 130.0
+        damage: 12.0
+        reward-tokens: 16
+      plague-broodmother:
+        health: 160.0
+        damage: 10.0
+        reward-tokens: 18
+      infernal-brute:
+        health: 200.0
+        damage: 14.0
+        reward-tokens: 20
+      dread-husk:
+        health: 180.0
+        damage: 11.0
+        reward-tokens: 17
+
+# Dynamic boss system
+boss:
+  auto-spawn-enabled: true
+  interval-minutes: 120
+  world: "world"
+  x: 0
+  y: 120
+  z: 0
+  random-spawn:
+    enabled: true
+    spread: 2200
+    min-distance-from-spawn: 450
+    max-distance-from-nearest-player: 500
+    min-distance-from-nearest-player: 80
+  token-bundle: 10
+  token-bundle-items: 0
+  min-players-for-reward: 1
+  solo-kill-token-reward: 10
+  solo-token-bundle-items: 0
+  reward-enchanted-gapple: 1
+  reward-totems: 3
+  reward-golden-apples: 8
+  server-buff-seconds: 300
+
+onboarding:
+  auto-open-learn-on-first-join: true
+  welcome-title: "Welcome to Bloodpine"
+
+# Cracked-mode authentication hardening
+security:
+  anti-vpn:
+    enabled: true
+    # proxycheck or ip-api
+    provider: "ip-api"
+    fallback-provider: "proxycheck"
+    # If anti-vpn lookup fails, allow join when true; block join when false
+    fail-open: false
+    request-timeout-millis: 3500
+    cache-minutes: 180
+    kick-message: "&cVPN/Proxy/Hosting connections are blocked on this server."
+    log-all-checks: false
+    debug-log: false
+    bypass-names:
+      - "Felushort"
+    proxycheck:
+      api-key: ""
+      min-risk-to-block: 0
+    ip-api:
+      block-hosting: true
+      block-mobile: false
+  cracked-auth:
+    enabled: true
+    # Exempt usernames from cracked-auth anti-alt limits (case-insensitive)
+    exempt-names:
+      - "Felushort"
+    # Maximum registered accounts allowed from one network bucket (<=0 disables)
+    max-accounts-per-ip: 2
+    # exact|subnet (subnet recommended for dynamic IPs)
+    account-limit-match: "subnet"
+    registration-cooldown-seconds: 120
+    # If true, registered accounts can only login from their original network
+    ip-lock-enabled: true
+    # exact|subnet
+    ip-lock-match: "subnet"
+    # Subnet size used by account-limit-match/ip-lock-match when mode=subnet
+    ipv4-subnet-bits: 24
+    ipv6-subnet-bits: 64
+
+# Black market system
+black-market:
+  unlock-tokens: 30
+  world: "world"
+  x: 150
+  y: 75
+  z: 150
+  illegal-book-cost: 12
+  risky-buff-cost: 8
+  combat-perk-cost: 10
+
+# Token sinks
+token-sinks:
+  gamble-win-chance: 0.45
+  combat-crate-cost: 7
+  trade-tax-rate: 0.10
+
+# Blood Forge permanent sink
+blood-forge:
+  enabled: true
+  cost: 20
+  damage-bonus-per-level: 0.01
+  max-level: 10
+
+# Heart insurance sink
+heart-insurance:
+  enabled: true
+  token-cost: 10
+  max-charges: 3
+
+# Team balancing
+team-balance:
+  same-team-kill-multiplier: 0.2
+  solo-kill-multiplier: 1.25
+  solo-damage-multiplier: 1.08
+  ally-check-radius: 40
+  proximity-nerf-start-allies: 2
+  proximity-nerf-per-ally: 0.12
+  proximity-damage-nerf-per-ally: 0.08
+  team-size-cap: 5
+  over-cap-team-kill-multiplier: 0.5
+
+# Reputation / Infamy
+reputation:
+  low-token-threshold: 5
+  high-token-threshold: 25
+  infamy-map-threshold: 12
+
+# Spawn interaction systems
+spawn:
+  daily-quest-kill-goal: 3
+  daily-quest-reward: 10
+  contract-kill-goal: 2
+  contract-reward: 12
+  parkour-reward: 3
+  parkour-fast-reward: 6
+  parkour-fast-time-millis: 120000
+
+# High-risk zone
+high-risk-zone:
+  enabled: true
+  world: "world"
+  x1: -2500
+  z1: -2500
+  x2: 2500
+  z2: 2500
+  damage-multiplier: 2.0
+  no-totems: true
+  extra-heart-loss-on-death: 1
+
+# Scheduled conflict supply drops
+supply-drop:
+  enabled: true
+  interval-minutes: 90
+  stat-scroll-chance: 0.35
+  despawn-minutes: 20
+
+# Combat logger body settings
+combat-logger:
+  body-seconds: 10
+
+# Cosmetics / prestige
+cosmetics:
+  rebirth-trail-level: 3
+
+# Endgame beyond rebirth
+endgame:
+  ascension-min-rebirth: 5
+  ascension-token-cost: 40
+  max-ascension: 5
+
+# Seasonal story arc
+seasonal-story:
+  current-tag: "S1"
+
+# Mechanics toggles
+mechanics:
+  silk-touch-spawners:
+    enabled: true
+  current-name: "Blood Plague"
+  beats:
+    - "Blood Plague"
+    - "Marked Uprising"
+    - "Fallen Kings"
+
+end-control:
+  enabled: true
+  open: false
+  owner: "Felushort"

@@ -28,7 +28,8 @@ public class TokensCommand implements CommandExecutor {
         
         sender.sendMessage(colorize("&c&m-----&r &c&lBloodpine Tokens &c&m-----"));
         sender.sendMessage(colorize("&7Total Tokens: &e" + data.getTotalTokens()));
-        sender.sendMessage(colorize("&7Allocated: &e" + data.getTotalAllocatedTokens()));
+        sender.sendMessage(colorize("&7Allocated Points: &e" + data.getTotalAllocatedTokens()));
+        sender.sendMessage(colorize("&7Spent on Allocation: &e" + data.getAllocatedTokenCost()));
         sender.sendMessage(colorize("&7Available: &a" + data.getAvailableTokens()));
         sender.sendMessage(colorize("&7Kills: &e" + data.getTotalKills()));
         sender.sendMessage(colorize("&7Deaths: &e" + data.getTotalDeaths()));

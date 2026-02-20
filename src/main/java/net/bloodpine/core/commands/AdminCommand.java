@@ -306,6 +306,25 @@ public class AdminCommand implements CommandExecutor {
                 plugin.getDataManager().saveData();
                 sender.sendMessage(colorize("&aReset rebirth progression for &f" + (resetTarget.getName() != null ? resetTarget.getName() : args[1])));
                 break;
+
+            case "seasonreward":
+                plugin.getGameplayExpansionManager().distributeSeasonLeaderboardRewards();
+                sender.sendMessage(colorize("&aSeason leaderboard rewards distributed."));
+                break;
+
+            case "seasonfinalhour":
+                plugin.getGameplayExpansionManager().startFinalHourEventManually();
+                sender.sendMessage(colorize("&aFinal hour event manually started."));
+                break;
+
+            case "seasonrollover":
+                plugin.getGameplayExpansionManager().distributeSeasonLeaderboardRewards();
+                plugin.getExpansionDataManager().beginNextSeason(
+                        plugin.getConfig().getBoolean("season.reset-season-counters-on-rollover", true));
+                plugin.getExpansionDataManager().save();
+                sender.sendMessage(colorize("&aSeason rolled over to #" + plugin.getExpansionDataManager().getSeasonNumber()));
+                Bukkit.broadcastMessage(colorize("&c&lManual season rollover complete. &7Welcome to season " + plugin.getExpansionDataManager().getSeasonNumber() + "."));
+                break;
                 
             default:
                 sendHelp(sender);
@@ -334,6 +353,9 @@ public class AdminCommand implements CommandExecutor {
         sender.sendMessage(colorize("&e/bloodpine rebirthgrant <player> <levels> &7- Grant rebirth levels"));
         sender.sendMessage(colorize("&e/bloodpine rebirthpoint <player> <points> &7- Grant rebirth points"));
         sender.sendMessage(colorize("&e/bloodpine rebirthreset <player> &7- Reset rebirth progression"));
+        sender.sendMessage(colorize("&e/bloodpine seasonreward &7- Grant top-10 seasonal cosmetics"));
+        sender.sendMessage(colorize("&e/bloodpine seasonfinalhour &7- Trigger final hour event now"));
+        sender.sendMessage(colorize("&e/bloodpine seasonrollover &7- Force season rollover"));
     }
     
     private String colorize(String message) {

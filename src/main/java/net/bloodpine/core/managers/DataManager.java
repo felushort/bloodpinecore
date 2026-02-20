@@ -57,10 +57,15 @@ public class DataManager {
             data.setTotalTokens(playerSection.getInt("totalTokens", 0));
             data.setTotalKills(playerSection.getInt("totalKills", 0));
             data.setTotalDeaths(playerSection.getInt("totalDeaths", 0));
+            data.setTotalAssists(playerSection.getInt("totalAssists", 0));
+            data.setLongestKillstreak(playerSection.getInt("longestKillstreak", 0));
             data.setMarked(playerSection.getBoolean("marked", false));
             data.setLifestealHearts(playerSection.getInt("lifestealHearts", 0));
             data.setRebirthLevel(playerSection.getInt("rebirthLevel", 0));
             data.setRebirthPoints(playerSection.getInt("rebirthPoints", 0));
+            data.setBloodForgeLevel(playerSection.getInt("bloodForgeLevel", 0));
+            data.setInsuredHearts(playerSection.getInt("insuredHearts", 0));
+            data.setRedeemedCodes(new HashSet<>(playerSection.getStringList("redeemedCodes")));
             
             // Load allocated tokens
             ConfigurationSection statsSection = playerSection.getConfigurationSection("stats");
@@ -71,10 +76,17 @@ public class DataManager {
                 }
             }
 
+            int legacyAllocated = data.getTotalAllocatedTokens();
+            int allocatedCost = playerSection.contains("allocatedTokenCost")
+                    ? playerSection.getInt("allocatedTokenCost", legacyAllocated)
+                    : legacyAllocated;
+            data.setAllocatedTokenCost(allocatedCost);
+
             int crystalCap = plugin.getConfig().getInt("stats.crystal.max-tokens", 0);
             int crystalAllocated = data.getAllocatedTokens(StatType.CRYSTAL);
             if (crystalCap <= 0 && crystalAllocated > 0) {
                 data.setAllocatedTokens(StatType.CRYSTAL, 0);
+                data.setAllocatedTokenCost(Math.min(data.getAllocatedTokenCost(), data.getTotalAllocatedTokens()));
             }
             
             playerDataMap.put(uuid, data);
@@ -91,10 +103,16 @@ public class DataManager {
             dataConfig.set(path + ".totalTokens", data.getTotalTokens());
             dataConfig.set(path + ".totalKills", data.getTotalKills());
             dataConfig.set(path + ".totalDeaths", data.getTotalDeaths());
+            dataConfig.set(path + ".totalAssists", data.getTotalAssists());
+            dataConfig.set(path + ".longestKillstreak", data.getLongestKillstreak());
             dataConfig.set(path + ".marked", data.isMarked());
             dataConfig.set(path + ".lifestealHearts", data.getLifestealHearts());
             dataConfig.set(path + ".rebirthLevel", data.getRebirthLevel());
             dataConfig.set(path + ".rebirthPoints", data.getRebirthPoints());
+            dataConfig.set(path + ".bloodForgeLevel", data.getBloodForgeLevel());
+            dataConfig.set(path + ".insuredHearts", data.getInsuredHearts());
+            dataConfig.set(path + ".allocatedTokenCost", data.getAllocatedTokenCost());
+            dataConfig.set(path + ".redeemedCodes", new ArrayList<>(data.getRedeemedCodes()));
             
             // Save allocated tokens
             for (StatType type : StatType.values()) {
