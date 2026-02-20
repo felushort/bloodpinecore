@@ -89,8 +89,6 @@ public class ItemRedeemListener implements Listener {
             Block adjacent = clicked.getRelative(face);
             player.sendBlockChange(adjacent.getLocation(), adjacent.getBlockData());
         }
-        // Resync inventory so eating/item-use state is correct on the client
-        player.updateInventory();
     }
 
     /**
